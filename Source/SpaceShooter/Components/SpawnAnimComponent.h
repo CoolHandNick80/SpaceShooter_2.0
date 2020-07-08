@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "Components/TimelineComponent.h"
 #include "Curves/CurveFloat.h"
+#include "Components/MyPawnMovementComponent.h"
 #include "SpawnAnimComponent.generated.h"
 
 class AMyPawn;
@@ -45,6 +46,7 @@ protected:
 
 	FVector SpawnLocation = FVector::ZeroVector;
 
+	UMyPawnMovementComponent* MyPawnMovementComponent = nullptr;
 	
 private:
 

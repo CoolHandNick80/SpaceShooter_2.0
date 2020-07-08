@@ -36,19 +36,52 @@ void USpawnAnimComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 void USpawnAnimComponent::HandleProgress(float Value)
 {
-	float NewRoll = FMath::Lerp(Roll, (Roll + 1440.F), Value);
+	if (MyPawn != nullptr)
+	{
+		float NewRoll = FMath::Lerp(Roll, (Roll + 1440.F), Value);
 
-	FRotator NewRotation(ActorRotation.Pitch, ActorRotation.Yaw, NewRoll);
+		FRotator NewRotation(ActorRotation.Pitch, ActorRotation.Yaw, NewRoll);
+		if (StaticMeshComponent != nullptr)
+		{
+			StaticMeshComponent->SetRelativeRotation(NewRotation);
+		}
 
-	StaticMeshComponent->SetRelativeRotation(NewRotation);
 
-	FVector NewLocation = FMath::Lerp(SpawnLocation, SpawnLocation + (FVector::ForwardVector * 60), Value);
-	MyPawn->SetActorLocation(NewLocation);
+		//FVector NewLocation = FMath::Lerp(SpawnLocation, SpawnLocation + (FVector::ForwardVector * 60), Value);
+
+		if (MyPawnMovementComponent != nullptr)
+		{
+			ATrack* MyTrack = MyPawnMovementComponent->Track;
+			if (MyTrack != nullptr)
+			{
+				USplineComponent* SplineComponent = MyTrack->GetSplineComponent();
+				if (SplineComponent != nullptr)
+				{
+					FVector NewLocation = FMath::Lerp(SpawnLocation, SplineComponent->GetLocationAtDistanceAlongSpline(0.F, ESplineCoordinateSpace::World), Value);
+
+					MyPawn->SetActorLocation(NewLocation);
+
+				}
+				
+			}
+
+		}
+
+	}
+	
 }
 
 void USpawnAnimComponent::EnableMovement()
 {
-	MyPawn->bMoveEnabled = true;
+	if (MyPawn != nullptr)
+	{
+		MyPawn->bMoveEnabled = true;
+
+		if (MyPawnMovementComponent != nullptr)
+		{
+			MyPawnMovementComponent->StartTrack();
+		}
+	}
 }
 
 //Sets Values for Spawning Animation
@@ -82,16 +115,22 @@ void USpawnAnimComponent::SetupData()
 
 			MyPawn = Cast<AMyPawn>(GetOwner());
 			verify(MyPawn != nullptr);
+			
+			if (MyPawn != nullptr)
+			{
+				StaticMeshComponent = MyPawn->GetStaticMeshComponent();
+				MyPawnMovementComponent = MyPawn->GetMyPawnMovementComponent();
+				SpawnLocation = MyPawn->GetActorLocation();
+				
+				if (StaticMeshComponent != nullptr)
+				{
+					ActorRotation = StaticMeshComponent->GetComponentRotation();
 
-			StaticMeshComponent = MyPawn->GetStaticMeshComponent();
+					Pitch = ActorRotation.Pitch;
 
-			ActorRotation = StaticMeshComponent->GetComponentRotation();
-
-			Pitch = ActorRotation.Pitch;
-
-			Roll = ActorRotation.Roll;
-
-			SpawnLocation = MyPawn->GetActorLocation();
+					Roll = ActorRotation.Roll;
+				}
+			}
 		}
 	}
 }

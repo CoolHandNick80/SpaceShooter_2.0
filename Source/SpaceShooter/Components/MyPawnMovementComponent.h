@@ -7,6 +7,7 @@
 #include "Components/TimelineComponent.h"
 #include "Curves/CurveFloat.h"
 #include "Gameplay/Track.h"
+#include "Components/BoxComponent.h"
 #include "MyPawnMovementComponent.generated.h"
 
 class AMyPawn;
@@ -134,6 +135,10 @@ private:
 
 	UFUNCTION()
 		void HandleProgress(float Value);
+
+	UFUNCTION()
+		void EndTrack();
+
 
 		
 };

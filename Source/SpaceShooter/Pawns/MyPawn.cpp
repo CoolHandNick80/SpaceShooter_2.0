@@ -18,7 +18,7 @@
 // Sets default values
 AMyPawn::AMyPawn()
 {
-	SceneComponent = CreateDefaultSubobject<USceneComponent>("SceneComponent");
+	//SceneComponent = CreateDefaultSubobject<USceneComponent>("SceneComponent");
 	//RootComponent = SceneComponent;
 
 
@@ -70,10 +70,10 @@ void AMyPawn::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//SpawnAnimComponent->PlayAnimation();
-	bMoveEnabled = true;
+	SpawnAnimComponent->PlayAnimation();
+	//bMoveEnabled = true;
 
-	MyPawnMovementComponent->StartTrack();
+	//MyPawnMovementComponent->StartTrack();
 	
 	GameMode = Cast<AMyGameModeBase>(UGameplayStatics::GetGameMode(this));
 	verify(GameMode != nullptr);

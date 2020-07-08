@@ -41,8 +41,8 @@ protected:
 	
 // Pointers to components
 protected:
-	UPROPERTY(VisibleAnywhere)
-		USceneComponent* SceneComponent = nullptr;
+	/*UPROPERTY(VisibleAnywhere)
+		USceneComponent* SceneComponent = nullptr;*/
 
 	UPROPERTY(VisibleAnywhere)
 		UBoxComponent* BoxComponent = nullptr;

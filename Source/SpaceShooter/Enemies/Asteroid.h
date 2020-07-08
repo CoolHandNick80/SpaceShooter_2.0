@@ -83,7 +83,7 @@ protected:
 	FTimerHandle TimerHandle;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float LifeTime = 10.F;
+		float LifeTime = 30.F;
 
 protected:
 	void SetUpScale(FVector InScale);
