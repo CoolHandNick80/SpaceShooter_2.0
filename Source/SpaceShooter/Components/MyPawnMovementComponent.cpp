@@ -4,6 +4,7 @@
 #include "Pawns/MyPawn.h"
 #include "UObject/ConstructorHelpers.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Engine/Engine.h"
 #include "DrawDebugHelpers.h"
 
@@ -195,29 +196,78 @@ void UMyPawnMovementComponent::MoveSpline(float InHozSpeed, float InForwardSpeed
 
 	if (MyPawn != nullptr)
 	{
-		FVector ForwardLocation = MyPawn->GetActorLocation() + FVector::ForwardVector*ForwardSpeed;
-		FVector HorizontalLocation = MyPawn->GetActorLocation() + FVector::RightVector*HozSpeed;
-		FVector VerticalLocation = MyPawn->GetActorLocation() + FVector::UpVector*VertSpeed;
+		//MyPawn->SetActorLocation(MyPawn->GetActorLocation() + DiffVector, true);
 
-		//GEngine->AddOnScreenDebugMessage(-1, 5.F, FColor::Red, DiffVector.ToString());
+		//GEngine->AddOnScreenDebugMessage(-1, 5.F, FColor::Purple, DiffVector.ToString());
+		
+		
 
-		//GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Red, FString::SanitizeFloat(FMath::Abs(ForwardLocation.X)));
+		ForwardLocation += FVector::ForwardVector * ForwardSpeed;
+		HorizontalLocation += FVector::RightVector * HozSpeed;
+		VerticalLocation += FVector::UpVector * VertSpeed;
 
-		MyPawn->SetActorLocation(MyPawn->GetActorLocation() + FVector(DiffVector.X, 0.F, 0.F) + (FVector::ForwardVector*ForwardSpeed), true);
+		
+		
+		//FVector SplineForwardLocation = UKismetMathLibrary::TransformLocation(NewSplineTransform, ForwardLocation);
+		//FVector SplineHorizontalLocation = UKismetMathLibrary::TransformLocation(NewSplineTransform, HorizontalLocation);
+		//FVector SplineVerticalLocation = UKismetMathLibrary::TransformLocation(NewSplineTransform, VerticalLocation);
+		
+		
 
 
+		//GEngine->AddOnScreenDebugMessage(-1, 5.F, FColor::Red, SplineForwardDistance.ToString());
+		//GEngine->AddOnScreenDebugMessage(-1, 5.F, FColor::Green, SplineHorizontalDistance.ToString());
+		//GEngine->AddOnScreenDebugMessage(-1, 5.F, FColor::Blue, SplineVerticalDistance.ToString());
 
-		//GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, FString::SanitizeFloat(FMath::Abs(HorizontalLocation.Y)));
+		
+		if (FMath::Abs(ForwardLocation.X) >= MaxForwardDistance)
+		{
+			if (ForwardLocation.X > 0)
+			{
+				ForwardLocation.X = MaxForwardDistance;
+			}
+			else
+			{
+				ForwardLocation.X = -MaxForwardDistance;
+			}
+		}
+		
+		if (FMath::Abs(HorizontalLocation.Y) >= MaxHorizontalDistance)
+		{
+			if (HorizontalLocation.Y > 0)
+			{
+				HorizontalLocation.Y = MaxHorizontalDistance;
+			}
+			else
+			{
+				HorizontalLocation.Y = -MaxHorizontalDistance;
+			}
+		}
+		
+		if (FMath::Abs(VerticalLocation.Z) >= MaxVerticalDistance)
+		{
+			if (VerticalLocation.Z > 0)
+			{
+				VerticalLocation.Z = MaxVerticalDistance;
+			}
+			else
+			{
+				VerticalLocation.Z = -MaxVerticalDistance;
+			}
+			
+		}
+		
+		FVector New = FVector(ForwardLocation.X, HorizontalLocation.Y, VerticalLocation.Z);
+		
+		FVector NewLocation = UKismetMathLibrary::TransformLocation(NewSplineTransform, New);
+		
+		FVector RelativeLocation = UKismetMathLibrary::InverseTransformLocation(NewSplineTransform, NewLocation);
 
-		MyPawn->SetActorLocation(MyPawn->GetActorLocation() + FVector(0.F, DiffVector.Y, 0.F) + (FVector::RightVector*HozSpeed), true);
+		GEngine->AddOnScreenDebugMessage(-1, 5.F, FColor::Purple, RelativeLocation.ToString());
+		
+		MyPawn->SetActorLocation(NewLocation, true);
 
-
-
-		//GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Blue, FString::SanitizeFloat(FMath::Abs(VerticalLocation.Z)));
-
-		MyPawn->SetActorLocation(MyPawn->GetActorLocation() + FVector(0.F, 0.F, DiffVector.Z) + (FVector::UpVector*VertSpeed), true);
-
-		MyPawn->SetActorRotation(MyPawn->GetActorRotation() + DiffRotator);
+		MyPawn->SetActorRotation(NewSplineRotation);
 
 		if (StaticMeshComponent != nullptr)
 		{
@@ -252,6 +302,9 @@ void UMyPawnMovementComponent::HandleProgress(float Value)
 			
 			NewSplineLocation = SplineComponent->GetLocationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
 			NewSplineRotation = SplineComponent->GetRotationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
+			NewSplineTransform = SplineComponent->GetTransformAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
+			
+			
 
 			DiffVector = NewSplineLocation - LastSplineLocation;
 			DiffRotator = NewSplineRotation - LastSplineRotation;

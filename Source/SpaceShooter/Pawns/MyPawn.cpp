@@ -104,7 +104,7 @@ void AMyPawn::Tick(float DeltaTime)
 		{
 			CrossHairComponent->SetWorldLocation(HitResult.Location);
 			CrossHairComponent->GetUserWidgetObject()->SetColorAndOpacity(FColor::Red);
-			GEngine->AddOnScreenDebugMessage(-1, 5.F, FColor::Blue, HitResult.Actor->GetName());
+			//GEngine->AddOnScreenDebugMessage(-1, 5.F, FColor::Blue, HitResult.Actor->GetName());
 
 		}
 		else

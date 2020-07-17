@@ -91,7 +91,15 @@ protected:
 
 	FRotator DiffRotator = FRotator::ZeroRotator;
 
+	FTransform NewSplineTransform = FTransform(NoInit);
 
+	FVector ForwardLocation = FVector::ZeroVector;
+	FVector HorizontalLocation = FVector::ZeroVector;
+	FVector VerticalLocation = FVector::ZeroVector;
+
+	FVector SplineForwardVector = FVector::ZeroVector;
+	FVector SplineRightVector = FVector::ZeroVector;
+	FVector SplineUpVector = FVector::ZeroVector;
 
 public:
 	UPROPERTY(EditAnywhere)
@@ -139,6 +147,12 @@ private:
 	UFUNCTION()
 		void EndTrack();
 
+// Spline movement getter
+public: 
 
-		
+	FVector GetNewSplineLocation() { return NewSplineLocation; }
+	FVector GetDiffVector() { return DiffVector; }
+	float GetForwardSpeed() { return ForwardSpeed; }
+	float GetHorizontalSpeed() { return HozSpeed; }
+	float GetVerticalSpeed() { return VertSpeed; }
 };
