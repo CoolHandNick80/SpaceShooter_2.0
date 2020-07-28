@@ -91,17 +91,6 @@ void UMyPawnMovementComponent::SetupData()
 
 		PawnMover.SetTimelineFinishedFunc(EndFunction);
 	}
-
-	if (Track != nullptr)
-	{
-		USplineComponent* SplineComponent = Track->GetSplineComponent();
-		if (SplineComponent != nullptr)
-		{
-			LastSplineLocation = SplineComponent->GetLocationAtDistanceAlongSpline(0.F, ESplineCoordinateSpace::World);
-			LastSplineRotation = SplineComponent->GetRotationAtDistanceAlongSpline(0.F, ESplineCoordinateSpace::World);
-		}
-		
-	}
 }
 
 void UMyPawnMovementComponent::SetHorizontalInput(float amount)
@@ -134,6 +123,7 @@ void UMyPawnMovementComponent::SetVerticalSpeed(float Val)
 	VertSpeed = SetSpeed(VertSpeed, Val);
 }
 
+/*Deprecated function*/
 void UMyPawnMovementComponent::Move(float InHozSpeed, float InForwardSpeed, float InVerticalSpeed)
 {
 	float Lenght = LastInput.Size();
@@ -147,38 +137,16 @@ void UMyPawnMovementComponent::Move(float InHozSpeed, float InForwardSpeed, floa
 	SetHorizontalSpeed(LastInput.Y);
 	SetVerticalSpeed(LastInput.Z);
 
-	FVector RootLocation = MyPawn->GetActorLocation();
-
-	FVector ForwardLocation = BoxComponent->GetRelativeLocation() + FVector::ForwardVector*ForwardSpeed;
-	FVector HorizontalLocation = BoxComponent->GetRelativeLocation() + FVector::RightVector*HozSpeed;
-	FVector VerticalLocation = BoxComponent->GetRelativeLocation() + FVector::UpVector*VertSpeed;
-
-	if (FMath::Abs(ForwardLocation.X) <= MaxForwardDistance)
-	{ 
-		//GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Red, FString::SanitizeFloat(FMath::Abs(ForwardLocation.X)));
+	if (MyPawn != nullptr)
+	{
+		MyPawn->SetActorLocation(MyPawn->GetActorLocation() + FVector::ForwardVector*ForwardSpeed, true);
+		MyPawn->SetActorLocation(MyPawn->GetActorLocation() + FVector::RightVector*HozSpeed, true);
+		MyPawn->SetActorLocation(MyPawn->GetActorLocation() + FVector::UpVector*VertSpeed, true);
 		
-		BoxComponent->SetRelativeLocation(BoxComponent->GetRelativeLocation() + FVector::ForwardVector*ForwardSpeed, true);
+		StaticMeshComponent->SetRelativeRotation(FMath::RInterpConstantTo(StaticMeshComponent->GetRelativeRotation(), FRotator(StaticMeshComponent->GetRelativeRotation().Pitch, StaticMeshComponent->GetRelativeRotation().Yaw, (Roll + HozSpeed * 7)), GetWorld()->GetDeltaSeconds(), 80.F));
+
+		LastInput = FVector::ZeroVector;
 	}
-	
-
-	if (FMath::Abs(HorizontalLocation.Y) <= MaxHorizontalDistance)
-	{
-		//GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Green, FString::SanitizeFloat(FMath::Abs(HorizontalLocation.Y)));
-
-		BoxComponent->SetRelativeLocation(BoxComponent->GetRelativeLocation() + FVector::RightVector*HozSpeed, true);
-	}
-	
-	
-	if (FMath::Abs(VerticalLocation.Z) <= MaxVerticalDistance)
-	{
-		//GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Blue, FString::SanitizeFloat(FMath::Abs(VerticalLocation.Z)));
-
-		BoxComponent->SetRelativeLocation(BoxComponent->GetRelativeLocation() + FVector::UpVector*VertSpeed, true);
-	}
-	
-	StaticMeshComponent->SetRelativeRotation(FMath::RInterpConstantTo(StaticMeshComponent->GetRelativeRotation(), FRotator(StaticMeshComponent->GetRelativeRotation().Pitch, StaticMeshComponent->GetRelativeRotation().Yaw, (Roll + HozSpeed * 7)), GetWorld()->GetDeltaSeconds(), 80.F));
-
-	LastInput = FVector::ZeroVector;
 }
 
 void UMyPawnMovementComponent::MoveSpline(float InHozSpeed, float InForwardSpeed, float InVerticalSpeed)
@@ -196,30 +164,10 @@ void UMyPawnMovementComponent::MoveSpline(float InHozSpeed, float InForwardSpeed
 
 	if (MyPawn != nullptr)
 	{
-		//MyPawn->SetActorLocation(MyPawn->GetActorLocation() + DiffVector, true);
-
-		//GEngine->AddOnScreenDebugMessage(-1, 5.F, FColor::Purple, DiffVector.ToString());
-		
-		
-
 		ForwardLocation += FVector::ForwardVector * ForwardSpeed;
 		HorizontalLocation += FVector::RightVector * HozSpeed;
 		VerticalLocation += FVector::UpVector * VertSpeed;
 
-		
-		
-		//FVector SplineForwardLocation = UKismetMathLibrary::TransformLocation(NewSplineTransform, ForwardLocation);
-		//FVector SplineHorizontalLocation = UKismetMathLibrary::TransformLocation(NewSplineTransform, HorizontalLocation);
-		//FVector SplineVerticalLocation = UKismetMathLibrary::TransformLocation(NewSplineTransform, VerticalLocation);
-		
-		
-
-
-		//GEngine->AddOnScreenDebugMessage(-1, 5.F, FColor::Red, SplineForwardDistance.ToString());
-		//GEngine->AddOnScreenDebugMessage(-1, 5.F, FColor::Green, SplineHorizontalDistance.ToString());
-		//GEngine->AddOnScreenDebugMessage(-1, 5.F, FColor::Blue, SplineVerticalDistance.ToString());
-
-		
 		if (FMath::Abs(ForwardLocation.X) >= MaxForwardDistance)
 		{
 			if (ForwardLocation.X > 0)
@@ -302,49 +250,13 @@ void UMyPawnMovementComponent::HandleProgress(float Value)
 			
 			NewSplineLocation = SplineComponent->GetLocationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
 			NewSplineRotation = SplineComponent->GetRotationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
-			NewSplineTransform = SplineComponent->GetTransformAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);
-			
-			
-
-			DiffVector = NewSplineLocation - LastSplineLocation;
-			DiffRotator = NewSplineRotation - LastSplineRotation;
-
-			LastSplineLocation = NewSplineLocation;
-			LastSplineRotation = NewSplineRotation;
-
-			//GEngine->AddOnScreenDebugMessage(-1, 5.F, FColor::Magenta, DiffVector.ToString());
+			NewSplineTransform = SplineComponent->GetTransformAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::World);	
 		}
-		
-
-		/*FHitResult HitResult;
-		const FVector& Start = BoxComponent->GetComponentLocation();
-		const FVector& End = Start + BoxComponent->GetForwardVector()*1000.F;
-		FCollisionQueryParams CollisionParams;
-
-		CollisionParams.AddIgnoredActor(MyPawn);
-
-
-		GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, CollisionParams);
-		DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, -1.F, (uint8)'\000', 1.F);*/
-
-		//MyPawn->SetActorLocation(NewLocation, true);
-		
-		
-		
-		/*if (HitResult.bBlockingHit)
-		{
-		GEngine->AddOnScreenDebugMessage(-1, 5.F, FColor::Green, HitResult.ToString());
-		}*/
-		
-
-		//MyPawn->SetActorRotation(NewRotation);
 	}
 }
 
 void UMyPawnMovementComponent::EndTrack()
 {
-	DiffVector = FVector::ZeroVector;
-
-	DiffRotator = FRotator::ZeroRotator;
+	
 }
 

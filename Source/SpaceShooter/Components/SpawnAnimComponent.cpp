@@ -51,7 +51,7 @@ void USpawnAnimComponent::HandleProgress(float Value)
 
 		if (MyPawnMovementComponent != nullptr)
 		{
-			ATrack* MyTrack = MyPawnMovementComponent->Track;
+			ATrack* MyTrack = MyPawnMovementComponent->GetMovementTrack();
 			if (MyTrack != nullptr)
 			{
 				USplineComponent* SplineComponent = MyTrack->GetSplineComponent();

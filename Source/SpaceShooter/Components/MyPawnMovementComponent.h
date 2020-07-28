@@ -77,31 +77,16 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float MaxVerticalDistance = 60.F;
 
-	// Spline movement variables (TEST)
-	
-	FVector LastSplineLocation = FVector::ZeroVector;
-
+	// Spline movement variables
 	FVector NewSplineLocation = FVector::ZeroVector;
-
-	FVector DiffVector = FVector::ZeroVector;
-
-	FRotator LastSplineRotation = FRotator::ZeroRotator;
-
 	FRotator NewSplineRotation = FRotator::ZeroRotator;
-
-	FRotator DiffRotator = FRotator::ZeroRotator;
-
 	FTransform NewSplineTransform = FTransform(NoInit);
 
 	FVector ForwardLocation = FVector::ZeroVector;
 	FVector HorizontalLocation = FVector::ZeroVector;
 	FVector VerticalLocation = FVector::ZeroVector;
 
-	FVector SplineForwardVector = FVector::ZeroVector;
-	FVector SplineRightVector = FVector::ZeroVector;
-	FVector SplineUpVector = FVector::ZeroVector;
 
-public:
 	UPROPERTY(EditAnywhere)
 		ATrack* Track = nullptr;
 	
@@ -129,7 +114,8 @@ public:
 	void SetForwardSpeed(float Val);
 
 	void SetVerticalSpeed(float Val);
-
+	
+	/*Deprecated function*/
 	void Move(float InHozSpeed, float InForwardSpeed, float InVerticalSpeed);
 
 	void MoveSpline(float InHozSpeed, float InForwardSpeed, float InVerticalSpeed);
@@ -151,8 +137,7 @@ private:
 public: 
 
 	FVector GetNewSplineLocation() { return NewSplineLocation; }
-	FVector GetDiffVector() { return DiffVector; }
-	float GetForwardSpeed() { return ForwardSpeed; }
-	float GetHorizontalSpeed() { return HozSpeed; }
-	float GetVerticalSpeed() { return VertSpeed; }
+
+	ATrack* GetMovementTrack() { return Track; }
+	
 };

@@ -49,30 +49,6 @@ void AMyGameplayCamera::UpdateGameplayCamera()
 		{
 			if (MyPawn->bMoveEnabled == true)
 			{
-				//SetActorLocation(MyPawn->GetBoxComponent()->GetComponentLocation());
-				//SetActorRotation(MyPawn->GetBoxComponent()->GetComponentRotation());
-
-				UMyPawnMovementComponent* MyPawnMovementComponent = MyPawn->GetMyPawnMovementComponent();
-
-				/*if (MyPawnMovementComponent != nullptr)
-				{
-					FVector PawnLocation = MyPawn->GetActorLocation();
-					FVector ForwardLocation = MyPawn->GetActorForwardVector() *  MyPawnMovementComponent->GetForwardSpeed();
-					FVector HorizontalLocation = MyPawn->GetActorRightVector() * MyPawnMovementComponent->GetHorizontalSpeed();
-					FVector VerticalLocation = MyPawn->GetActorUpVector() * MyPawnMovementComponent->GetVerticalSpeed();
-
-					FVector SplineLocation = MyPawnMovementComponent->GetNewSplineLocation();
-					FVector Diff = PawnLocation - SplineLocation;
-
-					SetActorLocation(SplineLocation + HorizontalLocation + VerticalLocation);
-					//SetActorLocation(SplineLocation + FVector(0, Diff.Y, 0));
-					//SetActorLocation(SplineLocation + FVector(0, 0, Diff.Z));
-
-
-				}*/
-
-				
-
 				SetActorLocation(MyPawn->GetActorLocation());
 				SetActorRotation(MyPawn->GetActorRotation());
 			}
